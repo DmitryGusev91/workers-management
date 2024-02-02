@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Departments</title>
+    <!--link to Bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <!--When the page loads , it loads the employee data and updates the filter options-->
+  <body onload="getAllDepartments()">
+    <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end of navbar code-->
+    <br />
+    <div class="container text-center">
+      <h1>Information of all Departments.</h1>
+    </div>
+    <br />
+    <!--the button starts a function to add an employee-->
+    <button type="button" class="btn btn-dark" onclick="addDepartment()">
+      Add Department
+    </button>
+    <br /><br />
+
+    <!--Department table with the headers , the rest is added dynamicly-->
+    <div>
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">Department Name</th>
+            <th scope="col">Manager Name</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const url = "http://localhost:8000/departments/manager";
+      const urlNoManager = "http://localhost:8000/departments/nomanager";
+      const urlEmp = "http://localhost:8000/employees";
+      const accessToken = sessionStorage["accessToken"];
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      //gets the departments data
+      async function getAllDepartments() {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+
+        //fetches all the departments
+        const resp = await fetch(url, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const departments = await resp.json();
+
+        const resp2 = await fetch(urlNoManager, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const departments2 = await resp2.json();
+
+        const combinedDepartments = [...departments, ...departments2];
+
+        //fetches all the employees
+        const respEmp = await fetch(urlEmp, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employees = await respEmp.json();
+
+        const tBody = document.getElementById("tBody");
+
+        //for each employee fetches his individual data and inserts it into the table
+        combinedDepartments.forEach((department) => {
+          const tr = document.createElement("tr");
+          const tdName = document.createElement("td");
+          const nameLink = document.createElement("a");
+          const tdMan = document.createElement("td");
+          const manLink = document.createElement("a");
+
+          //makes name as a link to edit employee with its unique ID
+          nameLink.href = "edit_department.html";
+          nameLink.onclick = () =>
+            sessionStorage.setItem("departmentId", department._id);
+
+          tdMan.innerHTML = "";
+          if (department.manager) {
+            //makes manager as a link to edit manager with its unique ID
+            manLink.href = "edit_employee.html";
+            manLink.onclick = () =>
+              sessionStorage.setItem("employeeId", department.manager);
+            manLink.innerHTML = department.managerName;
+            tdMan.appendChild(manLink);
+          }
+          nameLink.innerHTML = department.name;
+
+          tdName.appendChild(nameLink);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdMan);
+
+          tBody.appendChild(tr);
+
+          //searches employees that are in the department and are not the manager (manager was edited before)
+          employeesPerDep = employees.filter(
+            (emp) => emp.departmentId === department._id
+          );
+
+          //if the department have employees push them into the nested table
+          if (employeesPerDep.length != 0) {
+            //creating the needed rows and columns and attributes needed by bootstrap
+            const nestedtr = document.createElement("tr");
+            const nestedtd = document.createElement("td");
+            nestedtd.setAttribute("colspan", "2");
+            const nestedTable = document.createElement("table");
+            nestedTable.className = "table table-bordered border-dark mb-0";
+            const tHead = document.createElement("tHead");
+            tHead.className = "table-secondary";
+
+            const trHead = document.createElement("tr");
+            const th1 = document.createElement("th");
+
+            th1.setAttribute("scope", "col");
+
+            th1.innerHTML = "Employee Name";
+
+            trHead.appendChild(th1);
+
+            tHead.appendChild(trHead);
+            const tNestedBody = document.createElement("tBody");
+
+            //for each employee another row will be created and his data will be displayed there
+            employeesPerDep.forEach((employee) => {
+              const tbRow = document.createElement("tr");
+              const emp = document.createElement("td");
+              const empLink = document.createElement("a");
+
+              empLink.href = "edit_employee.html";
+
+              empLink.onclick = () =>
+                sessionStorage.setItem("employeeId", employee._id);
+              empLink.innerHTML = employee.firstName + " " + employee.lastName;
+
+              emp.appendChild(empLink);
+
+              tbRow.appendChild(emp);
+
+              tNestedBody.appendChild(tbRow);
+            });
+
+            nestedTable.appendChild(tHead);
+            nestedTable.appendChild(tNestedBody);
+            nestedtd.appendChild(nestedTable);
+            nestedtr.appendChild(nestedtd);
+            tBody.appendChild(nestedtr);
+          }
+        });
+      }
+
+      //goes to the add_department page
+      function addDepartment() {
+        location.href = "add_department.html";
+      }
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

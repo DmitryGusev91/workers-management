@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Employee</title>
+    <!--link to bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body onload="firstLoad()">
+    <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+<!--end of navbar code-->
+
+    <!--div for messages-->
+    <div id="msg"></div>
+    <br />
+    <div class="container text-center">
+      <h1>Edit Employee</h1>
+    </div>
+    <br />
+
+    <!--form for data inputs-->
+    <form>
+      <!--First Name-->
+      <div class="mb-3">
+        <label for="firstNameInput" class="form-label">First Name:</label>
+        <input type="text" class="form-control" id="firstNameInput" />
+      </div>
+      <!--Last Name-->
+      <div class="mb-3">
+        <label for="lastNameInput" class="form-label">Last Name:</label>
+        <input type="text" class="form-control" id="lastNameInput" />
+      </div>
+      <!--Year of recruitment-->
+      <div class="mb-3">
+        <label for="YearOfRecruitmentInput" class="form-label"
+          >Year of Recruitment:</label
+        >
+        <input type="number" class="form-control" id="YearOfRecruitmentInput" />
+      </div>
+
+      <!--Select with all the departments-->
+      <label for="depSelect" class="form-label">Department:</label>
+      <select
+        class="form-select"
+        id="depSelect"
+        aria-label="Default select example"
+      >
+        <option selected></option>
+      </select>
+      <br /><br />
+
+      <!--Shifts table-->
+      <h2>Shifts</h2>
+      <div>
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+      <br />
+
+      <!--Select to add shifts-->
+      <label for="shiftSelect" class="form-label"
+        >Select the shift you want to add and press add</label
+      >
+      <select
+        class="form-select"
+        id="shiftSelect"
+        aria-label="Default select example"
+      ></select>
+      <br /><br />
+
+      <!--update, delete and add buttons-->
+      <button
+        type="input"
+        class="btn btn-primary"
+        onclick="updateEmployee(event)"
+      >
+        Update
+      </button>
+      <button
+        type="input"
+        class="btn btn-primary"
+        onclick="deleteEmployee(event)"
+      >
+        Delete
+      </button>
+
+      <button type="input" class="btn btn-primary" onclick="addShift(event)">
+        Add
+      </button>
+    </form>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const urlEmp = "http://localhost:8000/employees";
+      const urlDep = "http://localhost:8000/departments";
+      const urlShift = "http://localhost:8000/shifts";
+      const employeeId = sessionStorage.getItem("employeeId");
+      const accessToken = sessionStorage["accessToken"];
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      //on first load need to load all the departments into select input, to laod current employees data, load his shifts
+      //and load into select AVAILABLE shifts
+      function firstLoad() {
+        loadDepartments();
+        loadData();
+        loadShifts();
+        loadShiftsToAdd();
+      }
+
+      //adds available (employee not on that shift) shift to employee
+      async function addShift(event) {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+        event.preventDefault(event);
+        //selects the selected shift and gets shifts ID (value in the select is shifts ID)
+        const select = document.getElementById("shiftSelect");
+        const selectValue = select.value;
+
+        //fetches the selected shift
+        const respShifts = await fetch(`${urlShift}/${selectValue}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const shift = await respShifts.json();
+
+        //fetches current employee
+        const respEmp = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await respEmp.json();
+
+        //updates shift with new employee id pushed
+        shift.employeesId.push(employeeId);
+        const objShift = {
+          date: shift.date,
+          startHour: shift.startHour,
+          endHour: shift.endHour,
+          employeesId: shift.employeesId,
+        };
+
+        //updates the shift with new employeeID array
+        await fetch(`${urlShift}/${shift._id}`, {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": accessToken,
+          },
+          body: JSON.stringify(objShift),
+        });
+
+        //updates employee with new shift id pushed
+        employee.shiftsId.push(shift._id);
+        const objEmp = {
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+          startWorkYear: employee.startWorkYear,
+          departmentId: employee.departmentId,
+          shiftsId: employee.shiftsId,
+        };
+
+        //updates the employee with new shiftsID array
+        await fetch(`${urlEmp}/${employee._id}`, {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": accessToken,
+          },
+          body: JSON.stringify(objEmp),
+        });
+
+        //updates the select with available shifts (this shift excluded)
+        loadShiftsToAdd();
+        //adds new shift into table
+        loadShifts();
+      }
+
+      //loads available shifts to a select
+      async function loadShiftsToAdd() {
+        //gets current employee
+        const resp = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await resp.json();
+
+        //fetches all the shifts
+        const respShifts = await fetch(urlShift, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const shifts = await respShifts.json();
+
+        if (employee.departmentId) {
+          //searching for shifts that arent already in the employees shift array (available shifts)
+          //and pushing them into availableShifts array
+          const availableShifts = [];
+          shifts.forEach((shift) => {
+            //if cant find shift at employees shiftsID array then add it to availableShifts
+            if (employee.shiftsId.findIndex((id) => id === shift._id) === -1) {
+              availableShifts.push(shift);
+            }
+          });
+          const select = document.getElementById("shiftSelect");
+          select.innerHTML = "";
+          //shows all the available shifts and gives value to select of current shifts id
+          availableShifts.forEach((shift) => {
+            const option = document.createElement("option");
+            option.setAttribute("value", shift._id);
+            option.innerText =
+              shift.date +
+              "   " +
+              shift.startHour +
+              ":00-" +
+              shift.endHour +
+              ":00";
+            select.appendChild(option);
+          });
+        }
+      }
+
+      //loads employees data into input boxes
+      async function loadData() {
+        //fetches curret employee
+        const resp = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await resp.json();
+
+        document.getElementById("firstNameInput").value = employee.firstName;
+        document.getElementById("lastNameInput").value = employee.lastName;
+        document.getElementById("YearOfRecruitmentInput").value =
+          employee.startWorkYear.toString();
+
+        const dep = document.getElementById("depSelect");
+        if (employee.departmentId) {
+          dep.value = employee.departmentId;
+        }
+      }
+
+      //loads current employees shifts
+      async function loadShifts() {
+        //fetches current employee
+        const resp = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await resp.json();
+
+        //fetches all the shifts
+        const respShifts = await fetch(urlShift, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const shifts = await respShifts.json();
+
+        const tBody = document.getElementById("tBody");
+        tBody.innerHTML = "";
+
+        //for each shift fetches its individual data and inserts it into the table
+        employee.shiftsId.forEach((shiftId) => {
+          const shift = shifts.find((s) => s._id === shiftId);
+          const tr = document.createElement("tr");
+          const tdDate = document.createElement("td");
+          const tdTime = document.createElement("td");
+          tdDate.innerHTML = shift.date;
+          tdTime.innerHTML = shift.startHour + ":00 - " + shift.endHour + ":00";
+          tr.appendChild(tdDate);
+          tr.appendChild(tdTime);
+
+          tBody.appendChild(tr);
+        });
+      }
+
+      //load all the departments into select input
+      async function loadDepartments() {
+        //fetch all the departments
+        const resp = await fetch(urlDep, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const departments = await resp.json();
+        const select = document.getElementById("depSelect");
+
+        //for each department inserts it in the select option menu and gives it the value of its id
+        departments.forEach((dep) => {
+          const option = document.createElement("option");
+          option.setAttribute("value", dep._id);
+
+          option.innerText = dep.name;
+          select.appendChild(option);
+        });
+      }
+
+      //updates current employee
+      async function updateEmployee(event) {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+        event.preventDefault(event);
+
+        //fetches employee
+        const respEmp = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await respEmp.json();
+
+        const msg = document.getElementById("msg");
+
+        //collect all meployees info from inputs
+        const firstName = document.getElementById("firstNameInput").value;
+        const lastName = document.getElementById("lastNameInput").value;
+        const startWorkYear = document.getElementById(
+          "YearOfRecruitmentInput"
+        ).value;
+        const checkSelect = document.getElementById("depSelect");
+        let dep;
+        if (checkSelect.value) {
+          dep = checkSelect.value;
+        }
+
+        //check that the inputs arent empty and the year is valid (1960 and above)
+        if (
+          firstName.trim() === "" ||
+          lastName.trim() === "" ||
+          parseInt(startWorkYear) < 1960
+        ) {
+          //if there is a problem with inputs then give error
+          const danger = document.createElement("div");
+          danger.className = "alert alert-danger";
+          danger.setAttribute("role", "alert");
+          danger.innerHTML =
+            "One or more fields is incorrect , please try again !!!";
+          msg.appendChild(danger);
+        } else {
+          //update employee with new data
+          const obj = {
+            firstName,
+            lastName,
+            startWorkYear,
+            shiftsId: employee.shiftsId,
+          };
+
+          if (checkSelect.value) {
+            obj.departmentId = dep;
+          }
+
+          const resp = await fetch(`${urlEmp}/${employeeId}`, {
+            method: "put",
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": accessToken,
+            },
+            body: JSON.stringify(obj),
+          });
+
+          //return to show all employees
+          location.href = "show_employees.html";
+        }
+      }
+
+      //deletes employee
+      async function deleteEmployee(event) {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+        event.preventDefault(event);
+        const response = await fetch(`${urlEmp}/${employeeId}`, {
+          method: "delete",
+          headers: { "x-access-token": accessToken },
+        });
+        //return to page show_employees
+        location.href = "show_employees.html";
+      }
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

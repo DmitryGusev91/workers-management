@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users</title>
+    <!--link to bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <!--loads user table on start-->
+  <body onload="getAllUsersDB()">
+   <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end of navbar code-->
+    <br />
+    <div class="container text-center">
+      <h1>Information of all Users.</h1>
+    </div>
+    <br /><br />
+
+    <div>
+      <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col-5">Full Name</th>
+            <th scope="col">Max Actions Allowed</th>
+            <th scope="col">Current Actions left</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const url = "http://localhost:8000/users";
+      const accessToken = sessionStorage["accessToken"];
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      sessionStorage["actions"] = sessionStorage["actions"] - 1;
+      console.log(sessionStorage["actions"]);
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      //loads users, creates rows for them and insert the data in the table
+      async function getAllUsersDB() {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+
+        //fetches users
+        const respToken = await fetch(url, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const users = await respToken.json();
+
+        const tBody = document.getElementById("tBody");
+
+        //for each user creates a row with thre columns and insert data there (full name,max actions, current actions)
+        users.forEach((user) => {
+          const tr = document.createElement("tr");
+
+          const tdName = document.createElement("td");
+          const tdMaxActions = document.createElement("td");
+          const tdCurrActions = document.createElement("td");
+
+          tdName.innerHTML = user.fullName;
+          tdMaxActions.innerHTML = user.maxNumOfActions;
+          tdCurrActions.innerHTML = user.numOfActions;
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdMaxActions);
+          tr.appendChild(tdCurrActions);
+
+          tBody.appendChild(tr);
+        });
+      }
+    </script>
+
+    <!--imports bootstrap-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

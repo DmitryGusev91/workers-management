@@ -1,0 +1,48 @@
+Name: Dmitry Gusev
+
+							Workers Manage Programme
+							------------------------
+remarks
+----------
+* Need to enter users data manualy to mongoDB (full name and max actions allowed , the rest is not needed), otherwise wont show in the users menu (in the instructions was said that you cant add users in web )
+*Need to run the project from main file because of the environment variable (node .\server\main.js)
+
+known issues
+--------------
+*Each HTML file have navbar code that is repeated exactly in the same way(duplocate code).
+
+========================================================================================================================================
+
+The project is built from two parts : server and client .  In addition it has a .env file which contains the secret session key that is needed to create token 
+and check authentication.
+In the server side there is a router folder which contains routers for users, shifts, employees, departments and the router that creates authentication token.
+It has models folder which contains mongoDB schemas for department, employee, shift and user.
+Data folder that contains a log of user actions that is recorded into a JSON.
+DAL folder with js file that lets to read and write users from json and from web.
+BLL folder with BLLs.
+
+And we have a config folder that will connect the server to the mongo data base .
+and a main file that will orchestrate the server and connect it to the front.
+
+==========================================================================================================================================
+When you run the program firstly you will enter the login page and you will have to enter valid name and email .
+After validating your credentials you will enter the the users page which is the main page . It will display all the users, with their max allowed acctions and the amount that is left.
+From there you can enter:
+Employees page that will show all the employees and their shift and departments. Each employee can be edited, each department can be edited.
+In the edit employee page we can edit current employee, add a shift or delet it.
+
+Department page which will display all the departments and the employees working on them.
+Each employee can be edited and each department can be edited.
+In the edit department page we nac edit the current department, delit it or add employees to this department , the employees must not be managers and not to work in the department already.
+
+Shift pagewhich displays all the shifts.
+Each shift can be edited . In the edit menu we can edit the shift itself or add available employees to the current shift.
+
+
+The name of the user that logged in will be displayed in the top right corner which will display a link to logout .
+
+In the Client Side there is an action.js file which contains a function that checks the remaining actions of the given user and detract by one each time the action is taken,
+if user have 0 actions left then loggs out.
+
+action.js will hold the code that will check if it is a new date , actions left and will deduct one action if actions left or logout if not.
+	     

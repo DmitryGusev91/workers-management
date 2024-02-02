@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Department</title>
+    <!--link to bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body onload="loadData()">
+    <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end of navbar code-->
+
+    <!--div for messages-->
+    <div id="msg"></div>
+    <br />
+    <div class="container text-center">
+      <h1>Edit Department</h1>
+    </div>
+    <br />
+
+    <!--form for data inputs-->
+    <form>
+      <!--First Name-->
+      <div class="mb-3">
+        <label for="depNameInput" class="form-label">Department Name:</label>
+        <input type="text" class="form-control" id="depNameInput" />
+      </div>
+
+      <!--Select with the loaded managers-->
+      <label for="managerSelect" class="form-label">Manager:</label>
+      <select
+        class="form-select"
+        id="managerSelect"
+        aria-label="Default select example"
+      ></select>
+      <br /><br />
+
+      <!--Select with the loaded employees-->
+      <label for="empSelect" class="form-label"
+        >Pick employee to add to department and press Add</label
+      >
+      <select
+        class="form-select"
+        id="empSelect"
+        aria-label="Default select example"
+      ></select>
+      <br /><br />
+
+      <button
+        type="input"
+        class="btn btn-primary"
+        onclick="updateDepartment(event)"
+      >
+        Update
+      </button>
+
+      <button type="input" class="btn btn-primary" onclick="deleteDepartment()">
+        Delete
+      </button>
+
+      <button type="input" class="btn btn-primary" onclick="addEmployee()">
+        Add
+      </button>
+    </form>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const urlEmp = "http://localhost:8000/employees";
+      const urlDep = "http://localhost:8000/departments";
+      const accessToken = sessionStorage["accessToken"];
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      const departmentId = sessionStorage.getItem("departmentId");
+
+      //loads current departments data
+      async function loadData() {
+        //fetches current department
+        const respDep = await fetch(`${urlDep}/${departmentId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const department = await respDep.json();
+
+        //fetch all employees
+        const respEmp = await fetch(urlEmp, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employees = await respEmp.json();
+
+        document.getElementById("depNameInput").value = department.name;
+        const select = document.getElementById("managerSelect");
+
+        //shows all employees
+        employees.forEach((emp) => {
+          const option = document.createElement("option");
+          option.innerHTML = emp.firstName + " " + emp.lastName;
+          option.value = emp._id;
+          select.appendChild(option);
+        });
+        //sets value on the current manager
+        select.value = department.manager;
+        updateEmployees();
+      }
+
+      //update current department
+      async function updateDepartment(event) {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+        event.preventDefault(event);
+
+        const msg = document.getElementById("msg");
+
+        const name = document.getElementById("depNameInput").value;
+        const manager = document.getElementById("managerSelect").value;
+
+        //checks taht all the inputs are valid
+        if (name.trim() === "") {
+          //if not valid then give error
+          const danger = document.createElement("div");
+          danger.className = "alert alert-danger";
+          danger.setAttribute("role", "alert");
+          danger.innerHTML =
+            "One or more fields is incorrect , please try again !!!";
+          msg.appendChild(danger);
+        } else {
+          //create object and update department with it
+          const obj = {
+            name,
+          };
+          if (manager.length > 0) {
+            obj.manager = manager;
+            const respEmp = await fetch(`${urlEmp}/${manager}`, {
+              method: "GET",
+              headers: { "x-access-token": accessToken },
+            });
+            const employee = await respEmp.json();
+            employee.departmentId = departmentId;
+
+            await fetch(`${urlEmp}/${manager}`, {
+              method: "put",
+              headers: {
+                "Content-Type": "application/json",
+                "x-access-token": accessToken,
+              },
+              body: JSON.stringify(employee),
+            });
+          }
+
+          const resp = await fetch(`${urlDep}/${departmentId}`, {
+            method: "put",
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": accessToken,
+            },
+            body: JSON.stringify(obj),
+          });
+          //return to shoe_departments page
+          location.href = "show_departments.html";
+        }
+      }
+
+      //deletes department
+      async function deleteDepartment() {
+        event.preventDefault(event);
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+
+        //deletes current department
+        const response = await fetch(`${urlDep}/${departmentId}`, {
+          method: "delete",
+          headers: { "x-access-token": accessToken },
+        });
+        //returns to shoe_departments page
+        location.href = "show_departments.html";
+      }
+
+      //update employee list in the select inputs
+      async function updateEmployees() {
+        //fetch employees
+        const respEmp = await fetch(urlEmp, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employees = await respEmp.json();
+
+        //for each employee that dont work in current department add it into select input
+        //and the value will be employees id
+        const selectEmp = document.getElementById("empSelect");
+        employees.forEach((emp) => {
+          if (emp.departmentId != departmentId) {
+            const option = document.createElement("option");
+            option.innerHTML = emp.firstName + " " + emp.lastName;
+            option.value = emp._id;
+            selectEmp.appendChild(option);
+          }
+        });
+      }
+
+      //add employee to department
+      async function addEmployee() {
+        //checks amount of available actions left to the user and deductes 1 action for loading the users
+        performAction();
+        empId = document.getElementById("empSelect").value;
+
+        //fetches an employee
+        const respEmp = await fetch(`${urlEmp}/${empId}`, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employee = await respEmp.json();
+
+        //update the current employee with new department ID
+        const obj = {
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+          startWorkYear: employee.startWorkYear,
+          departmentId: departmentId,
+          shiftsId: employee.shiftsId,
+        };
+
+        const resp = await fetch(`${urlEmp}/${empId}`, {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": accessToken,
+          },
+          body: JSON.stringify(obj),
+        });
+        //update employees select input list that dont work in current department
+        updateEmployees();
+      }
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

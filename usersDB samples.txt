@@ -1,0 +1,52 @@
+here is the data needed to enter to mongo manualy (you can enter only the users data).
+you can enter num of actions accordin to what you want.
+
+{
+    "fullName" : "Ervin Howell",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Clementine Bauch",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Patricia Lebsack",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Chelsey Dietrich",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Mrs. Dennis Schulist",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Kurtis Weissnat",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Nicholas Runolfsdottir V",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Glenna Reichert",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Clementina DuBuque",
+    "maxNumOfActions" : NumberInt(10),
+}
+
+{
+    "fullName" : "Leanne Graham",
+    "maxNumOfActions" : NumberInt(10),
+}

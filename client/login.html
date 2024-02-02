@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LogIn</title>
+    <!--link to bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .background-image-div {
+        background-image: url("./381282567_814728080393332_3675408519403456835_n.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        width: 100%;
+        height: 100%;
+      }
+
+      #inputt {
+        padding-top: 15%;
+        padding-left: 25%;
+        padding-right: 25%;
+      }
+      #example {
+        color: white;
+        background-color: black;
+      }
+      #button{
+        margin-left: 45%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-image-div">
+      <div id="input">
+        <form id="inputt" class="row g-3">
+          <div id="login">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="user"
+                placeholder="username"
+              />
+              <label for="user">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="name@example.com"
+              />
+              <label for="email">Email address</label>
+            </div>
+          </div>
+          <div id="example" class="form-text">
+            Username: Leanne Graham &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Email address: Sincere@april.biz
+          </div>
+          <div class="col-12">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              onclick="login(event)"
+              id="button"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const url = "http://localhost:8000/auth/login";
+
+      //fetches data from input form and checks if the given data is in the db(cloud)
+      const login = async (event) => {
+        event.preventDefault(event);
+        //takes the data from the inputs
+        const loginData = {
+          username: document.getElementById("user").value,
+          email: document.getElementById("email").value,
+        };
+
+        //sends the data to check if user exists and if yes then create a unique token
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(loginData),
+        });
+        const data = await resp.json();
+
+        //sends the name to sessionStorage for future displays, the toke for future authentication check and goes to home page
+        sessionStorage["username"] = document.getElementById("user").value;
+        sessionStorage["accessToken"] = data.accessToken;
+        location.href = "home.html";
+      };
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

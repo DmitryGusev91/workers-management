@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Employees</title>
+    <!--link to Bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <!--When the page loads , it loads the employee data and updates the filter options-->
+  <body onload="firstLoad()">
+    <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end of navbar code-->
+    <br />
+    <div class="container text-center">
+      <h1>Information of all Employees.</h1>
+    </div>
+    <br />
+    <!--the button starts a function to edd an employee-->
+    <button type="button" class="btn btn-dark" onclick="addEmployee()">
+      Add Employee
+    </button>
+
+    <!--dropdown button with the filter options to show employees by departments-->
+    <div class="dropdown">
+      <button
+        class="btn btn-dark dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Filter By Department
+      </button>
+      <ul class="dropdown-menu" id="depFilter">
+        <li>
+          <!--the default option 'all' start getAllEmployees with filter '' to show all employees-->
+          <a class="dropdown-item" href="#" onclick="getAllEmployees('')"
+            >All</a
+          >
+        </li>
+      </ul>
+    </div>
+
+    <br /><br />
+
+    <!--employee table with the headers , the rest is added dynamicly-->
+    <div class="table-responsive-m">
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col" class="col-3">Full Name</th>
+            <th scope="col" class="col-5">Department</th>
+            <th scope="col" class="col-3">Starting Year</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const url = "http://localhost:8000/employees/departments";
+      const urlEmpl = "http://localhost:8000/employees";
+      const urlDep = "http://localhost:8000/departments";
+      const accessToken = sessionStorage["accessToken"];
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      //checks amount of available actions left to the user and deductes 1 action for loading the users
+      //then shows the employee data and updates the filter by departments option
+      function firstLoad() {
+        performAction();
+        getAllEmployees("");
+        fillFilter();
+      }
+
+      //gets the employee data depending on the department that was given ('' means all the employees)
+      async function getAllEmployees(filter) {
+        //checks authentication and fetches the employees
+        const resp = await fetch(url + filter, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const employees = await resp.json();
+
+        let combinedEmployees;
+
+        if (!filter) {
+          const resp2 = await fetch(`${urlEmpl}/nodepartment`, {
+            method: "GET",
+            headers: { "x-access-token": accessToken },
+          });
+          const employees2 = await resp2.json();
+          combinedEmployees = [...employees, ...employees2];
+        } else {
+          combinedEmployees = employees;
+        }
+
+        const tBody = document.getElementById("tBody");
+        tBody.innerHTML = "";
+
+        //for each employee fetches his individual data and inserts it into the table
+        combinedEmployees.forEach((employee) => {
+          const tr = document.createElement("tr");
+          const tdName = document.createElement("td");
+          const nameLink = document.createElement("a");
+          const tdDep = document.createElement("td");
+          const depLink = document.createElement("a");
+          const tdYear = document.createElement("td");
+          tdDep.innerHTML = "";
+          //makes name as a link to edit specific employee with its unique ID
+          nameLink.href = "edit_employee.html";
+          nameLink.onclick = () =>
+            sessionStorage.setItem("employeeId", employee._id);
+
+          //if employee have a department then display it
+          if (employee.departmentId) {
+            //makes department as a link to edit sepcific department with its unique ID
+            depLink.href = "edit_department.html";
+            depLink.onclick = () =>
+              sessionStorage.setItem("departmentId", employee.departmentId);
+            depLink.innerHTML = employee.department;
+            tdDep.appendChild(depLink);
+          }
+
+          nameLink.innerHTML = employee.fullName;
+          tdName.appendChild(nameLink);
+          tdYear.innerHTML = employee.startWorkYear;
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdDep);
+          tr.appendChild(tdYear);
+
+          tBody.appendChild(tr);
+
+          //if the employee have shits then we create a nested table and enter shifts data in it
+          if (employee.shifts.length != 0) {
+            //creating the needed rows and columns and attributes needed by bootstrap
+            const nestedtr = document.createElement("tr");
+            const nestedtd = document.createElement("td");
+            nestedtd.setAttribute("colspan", "3");
+            const nestedTable = document.createElement("table");
+            nestedTable.className = "table mb-0";
+            const tHead = document.createElement("tHead");
+            tHead.className = "table-secondary";
+
+            const trHead = document.createElement("tr");
+            const th1 = document.createElement("th");
+            const th2 = document.createElement("th");
+            const th3 = document.createElement("th");
+            th1.setAttribute("scope", "col");
+            th2.setAttribute("scope", "col");
+            th3.setAttribute("scope", "col");
+
+            th1.innerHTML = "Date";
+            th2.innerHTML = "Start Hour";
+            th3.innerHTML = "End Hour";
+
+            trHead.appendChild(th1);
+            trHead.appendChild(th2);
+            trHead.appendChild(th3);
+            tHead.appendChild(trHead);
+            const tNestedBody = document.createElement("tBody");
+
+            //for each shift another row will be created with columns and the data will be displayed there
+            employee.shifts.forEach((shift) => {
+              const tbRow = document.createElement("tr");
+              const date = document.createElement("td");
+              const sHour = document.createElement("td");
+              const endH = document.createElement("td");
+
+              //format the date to dd-mm-yyyy
+              const dateRaw = new Date(shift.date);
+              const day = dateRaw.getUTCDate().toString().padStart(2, "0");
+              const month = (dateRaw.getUTCMonth() + 1)
+                .toString()
+                .padStart(2, "0"); // Months are zero-based, so add 1
+              const year = dateRaw.getUTCFullYear();
+
+              const newDate = `${day}-${month}-${year}`;
+
+              date.innerHTML = newDate;
+              sHour.innerHTML = shift.startHour;
+              endH.innerHTML = shift.endHour;
+
+              tbRow.appendChild(date);
+              tbRow.appendChild(sHour);
+              tbRow.appendChild(endH);
+              tNestedBody.appendChild(tbRow);
+            });
+
+            nestedTable.appendChild(tHead);
+            nestedTable.appendChild(tNestedBody);
+            nestedtd.appendChild(nestedTable);
+            nestedtr.appendChild(nestedtd);
+            tBody.appendChild(nestedtr);
+          }
+        });
+      }
+
+      //goes to the add_employee page
+      function addEmployee() {
+        location.href = "add_employee.html";
+      }
+
+      //inserts all the departments in the filter (dropdown) , and gives each department the ability to filter employees by department
+      async function fillFilter() {
+        const respDep = await fetch(urlDep, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const departments = await respDep.json();
+        const drop = document.getElementById("depFilter");
+
+        //for each unique department we have we will insert it into the dropdown and return it an onclick function
+        departments.forEach((department) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          //the function will get employees but the filter will be the postfix of the url to get the needed data by the department
+          a.addEventListener("click", () =>
+            getAllEmployees(`?department=${department.name}`)
+          );
+          a.className = "dropdown-item";
+          a.setAttribute("href", "#");
+
+          a.innerHTML = department.name;
+          li.appendChild(a);
+          drop.appendChild(li);
+        });
+      }
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

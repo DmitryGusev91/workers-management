@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Shifts</title>
+    <!--link to Bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body onload="showShifts()">
+    <!--navbar code-->
+      <nav
+        class="navbar navbar-expand-md navbar-dark bg-dark"
+        aria-label="Fourth navbar example"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarsExample04"
+            aria-controls="navbarsExample04"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Employees</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_employees.html"
+                      >Show Employees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_employee.html"
+                      >Add Employee</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Departments</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_departments.html"
+                      >Show Departments</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_department.html"
+                      >Add Department</a
+                    >
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >Shifts</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="show_shifts.html"
+                      >Show Shifts</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="add_shift.html">Add Shift</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  id="name"
+                  class="nav-link navbar-brand dropdown-toggle"
+                  href="#"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                ></a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" id="logout" href="login.html"
+                      >Log Out</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end of navbar code-->
+    <br />
+    <div class="container text-center">
+      <h1>Information of all Shifts.</h1>
+    </div>
+    <br />
+    <button type="button" class="btn btn-dark" onclick="addShift()">
+      Add Shift
+    </button>
+    <br /><br />
+    <div>
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Start Hour</th>
+            <th scope="col">End Hour</th>
+            <th scope="col">Edit Shift</th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+
+    <!--loads the make action function-->
+    <script src="action.js"></script>
+
+    <script>
+      const urlShift = "http://localhost:8000/shifts";
+      const urlActions = "http://localhost:8000/auth/action";
+
+      //puts the users name in the far right corner
+      const username = sessionStorage["username"];
+      document.getElementById("name").innerHTML = username;
+
+      //logs out on click on the log out option and removes the users token from storage
+      const logout = document.getElementById("logout");
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem("accessToken");
+      });
+
+      //fetches shifts data and displays it in the table
+      async function showShifts() {
+        //fetches the data of the shifts after token check
+        const accessToken = sessionStorage["accessToken"];
+        const respShift = await fetch(urlShift, {
+          method: "GET",
+          headers: { "x-access-token": accessToken },
+        });
+        const shifts = await respShift.json();
+
+        const body = document.getElementById("tBody");
+
+        //for each shift creates a row and enter the fetched data in it (date , starting hour, ending hour)
+        shifts.forEach((shift) => {
+          const tr = document.createElement("tr");
+          const tdDate = document.createElement("td");
+          const tdStartH = document.createElement("td");
+          const tdEndH = document.createElement("td");
+          const tdEdit = document.createElement("td");
+
+          const date = new Date(shift.date);
+          //formanting date from 2023-09-09T00:00:00.000Z to 09-09-2023
+          const formattedDate = `${date
+            .getDate()
+            .toString()
+            .padStart(2, "0")}-${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}-${date.getFullYear()}`;
+
+          tdDate.innerHTML = formattedDate;
+          tdStartH.innerHTML = shift.startHour;
+          tdEndH.innerHTML = shift.endHour;
+
+          //craetes a button , if pressed then sends you to the edit_shift page with this specific shifts ID
+          const button = document.createElement("a");
+          button.className = "btn btn-primary";
+          button.setAttribute("role", "button");
+          button.setAttribute("href", "edit_shift.html");
+          button.innerHTML = "Edit";
+          button.onclick = () => sessionStorage.setItem("shiftId", shift._id);
+          tdEdit.appendChild(button);
+
+          tr.appendChild(tdDate);
+          tr.appendChild(tdStartH);
+          tr.appendChild(tdEndH);
+          tr.appendChild(tdEdit);
+
+          body.appendChild(tr);
+        });
+      }
+
+      //sends you to add_shift page
+      function addShift() {
+        location.href = "add_shift.html";
+      }
+    </script>
+
+    <!--bootstrap addons-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
